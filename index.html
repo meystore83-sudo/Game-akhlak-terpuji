@@ -225,9 +225,9 @@
         let gameStarted = false;
         let isPausedForModal = false;
 
-        // Slingshot Pull State
+        // Slingshot Pull State (Diposisikan agak ke atas, 130px dari bawah layar)
         const bowBaseX = () => canvas.width / 2;
-        const bowBaseY = () => canvas.height - 80;
+        const bowBaseY = () => canvas.height - 130;
         let isDragging = false;
         let dragX = 0;
         let dragY = 0;
@@ -257,7 +257,7 @@
             while (balloons.length < 4 && currentQuestionIndex + balloons.length < 20) {
                 let radius = 26;
                 let x = Math.random() * (canvas.width - 150) + 75;
-                let y = canvas.height - 220 - Math.random() * 150;
+                let y = canvas.height - 250 - Math.random() * 150;
                 let color = colors[Math.floor(Math.random() * colors.length)];
                 let speedY = 0.4 + Math.random() * 0.6;
                 let speedX = (Math.random() - 0.5) * 0.4;
