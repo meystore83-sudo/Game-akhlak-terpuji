@@ -1,0 +1,278 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0,maximum-scale=1.0,user-scalable=no">
+<title>🎈 Akhlak Terpuji: Berilmu & Kerja Keras</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700;800&display=swap" rel="stylesheet">
+<style>
+*{box-sizing:border-box}html,body{margin:0;width:100%;height:100%;overflow:hidden}
+body{font-family:Poppins,sans-serif;background:#0f172a;user-select:none;-webkit-user-select:none;touch-action:none}
+#game-bg{background-image:url('https://raw.githubusercontent.com/meystore83-sudo/Akidah-Akhlak/698d7143342cc9a85f0865cf63b07e8acff66482/235394EA-46D9-4BAD-901F-74D6D9C9EE65.png');background-size:cover;background-position:center}
+.glass{background:rgba(15,23,42,.78);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px)}
+.card{background:rgba(255,255,255,.94);backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px)}
+@keyframes float{0%,100%{transform:translateY(0)}50%{transform:translateY(-12px)}}
+.float{animation:float 3s ease-in-out infinite}
+@keyframes pulse{0%,100%{box-shadow:0 0 14px rgba(251,191,36,.45)}50%{box-shadow:0 0 30px rgba(251,191,36,.9)}}
+.pulse{animation:pulse 2s infinite}
+</style>
+</head>
+<body class="relative text-white">
+
+<div id="game-bg" class="absolute inset-0 z-0"><div class="absolute inset-0 bg-slate-950/35"></div></div>
+
+<audio id="bgm" loop preload="auto">
+<source src="https://raw.githubusercontent.com/meystore83-sudo/Akidah-Akhlak/698d7143342cc9a85f0865cf63b07e8acff66482/follow_the_gilded_path.mp3" type="audio/mpeg">
+</audio>
+
+<!-- PEMBUKA -->
+<section id="welcome" class="absolute inset-0 z-50 flex items-center justify-center p-5 bg-slate-950/75 backdrop-blur-sm text-center">
+<div class="glass w-full max-w-2xl rounded-3xl p-7 md:p-12 border border-white/20 shadow-2xl">
+<div class="text-6xl md:text-7xl float mb-4">🎈</div>
+<h1 class="text-3xl md:text-5xl font-extrabold text-amber-300 leading-tight">AKHLAK TERPUJI KEPADA DIRI SENDIRI</h1>
+<h2 class="text-xl md:text-2xl font-bold text-emerald-300 mt-3 mb-5">Berilmu dan Kerja Keras</h2>
+<p class="text-slate-200 mb-7 text-sm md:text-lg">“Tarik panah ke belakang, arahkan ke balon, lalu lepaskan!”</p>
+<button id="startBtn" class="pulse bg-gradient-to-r from-emerald-500 to-teal-600 px-9 py-4 rounded-full text-lg md:text-xl font-extrabold shadow-lg active:scale-95">▶️ MULAI BERMAIN</button>
+</div>
+</section>
+
+<!-- HEADER -->
+<header class="absolute top-0 left-0 right-0 z-20 p-3 md:p-4 bg-slate-900/80 backdrop-blur-md border-b border-white/10">
+<div class="flex flex-col md:flex-row md:items-center md:justify-between gap-2">
+<div>
+<h1 class="text-sm md:text-lg font-extrabold text-amber-300">AKHLAK TERPUJI KEPADA DIRI SENDIRI</h1>
+<div class="flex flex-wrap gap-x-4 gap-y-1 text-xs md:text-sm font-semibold">
+<span id="score">Skor: 0</span><span id="progressText">Balon pecah: 0 / 20</span>
+</div>
+</div>
+<div class="flex items-center gap-2">
+<div class="w-28 md:w-48 h-2.5 bg-slate-700 rounded-full overflow-hidden"><div id="progress" class="h-full w-0 bg-gradient-to-r from-emerald-400 to-teal-400 transition-all"></div></div>
+<button id="soundBtn" class="bg-slate-800 border border-white/10 px-3 py-2 rounded-xl text-xs md:text-sm">🔊 ON</button>
+<button id="fsBtn" class="bg-slate-800 border border-white/10 px-3 py-2 rounded-xl text-xs md:text-sm">⛶</button>
+</div>
+</div>
+</header>
+
+<main id="gameArea" class="absolute inset-0 z-10">
+<canvas id="canvas"></canvas>
+<div id="hint" class="absolute bottom-3 left-1/2 -translate-x-1/2 glass rounded-full px-4 py-2 text-xs md:text-sm text-white/90 pointer-events-none">🏹 Tarik dari busur ke belakang, lalu lepaskan</div>
+</main>
+
+<!-- MODAL -->
+<div id="sentenceModal" class="hidden absolute inset-0 z-40 bg-slate-950/80 backdrop-blur-md flex items-center justify-center p-5">
+<div class="card text-slate-900 max-w-xl w-full rounded-3xl p-7 md:p-10 text-center shadow-2xl border border-white/60">
+<div class="text-4xl mb-3">🌟</div>
+<div class="text-sm font-bold text-emerald-700 mb-3">AKHLAK TERPUJI</div>
+<h2 id="sentence" class="text-xl md:text-3xl font-extrabold leading-snug mb-7"></h2>
+<button id="nextBtn" class="bg-gradient-to-r from-emerald-500 to-teal-600 text-white font-bold text-lg px-10 py-3.5 rounded-2xl shadow-lg active:scale-95">➡️ LANJUT</button>
+</div>
+</div>
+
+<!-- GAME OVER -->
+<div id="gameover" class="hidden absolute inset-0 z-50 bg-slate-950/90 backdrop-blur-lg flex items-center justify-center p-5">
+<div class="card text-slate-900 max-w-xl w-full rounded-3xl p-8 md:p-10 text-center shadow-2xl">
+<div class="text-6xl mb-2">🎉🎉🎉</div>
+<h2 class="text-3xl font-extrabold text-amber-600">SELAMAT!</h2>
+<p class="font-semibold mt-2 mb-6">Semua 20 akhlak terpuji telah ditemukan.</p>
+<div class="grid grid-cols-2 gap-3 mb-6">
+<div class="bg-emerald-50 border border-emerald-200 rounded-2xl p-4"><div class="text-xs text-slate-500">✨ Akhlak</div><b class="text-xl text-emerald-700">20 / 20</b></div>
+<div class="bg-amber-50 border border-amber-200 rounded-2xl p-4"><div class="text-xs text-slate-500">🏆 Skor</div><b id="finalScore" class="text-xl text-amber-700">200</b></div>
+</div>
+<p class="italic text-sm text-slate-600 bg-slate-100 rounded-2xl p-4 mb-7">“Orang yang berilmu akan terus belajar, sedangkan orang yang bekerja keras tidak mudah menyerah.”</p>
+<button id="restartBtn" class="bg-gradient-to-r from-emerald-500 to-teal-600 text-white font-bold px-8 py-3.5 rounded-2xl active:scale-95">🔄 MAIN LAGI</button>
+</div>
+</div>
+
+<script>
+const DATA=[
+"Rina bertanya ketika belum memahami pelajaran.",
+"Dimas membaca buku meski tidak ada tugas.",
+"Aisyah memeriksa kebenaran informasi sebelum membagikannya.",
+"Fajar mau belajar dari temannya.",
+"Siti belajar dari kesalahan yang diperbuatnya.",
+"Andi membantu teman memahami materi.",
+"Nabila mencari jawaban dari sumber yang tepat.",
+"Rafi tetap belajar meski nilainya sudah bagus.",
+"Lala membiasakan diri membuang sampah pada tempatnya.",
+"Hasan menerapkan ilmunya dalam kehidupan sehari-hari.",
+"Aisyah menyelesaikan tugas sebelum beristirahat.",
+"Rafi terus berlatih membaca Al-Qur’an.",
+"Dimas belajar lebih giat setelah nilainya kurang memuaskan.",
+"Siti terus berlatih meski jawabannya salah.",
+"Fajar menyelesaikan tugas kelompok tepat waktu.",
+"Nabila terus berlatih meski harus mengulang.",
+"Hasan membantu orang tua sebelum mengerjakan tugas.",
+"Rina terus mencoba meski hasilnya belum sesuai.",
+"Ilham menyelesaikan tugas sebelum bermain.",
+"Zahra rutin belajar demi meraih cita-citanya."
+];
+
+const canvas=document.getElementById('canvas'),ctx=canvas.getContext('2d');
+const bgm=document.getElementById('bgm');
+let W=0,H=0,dpr=1,started=false,paused=false,muted=false,score=0,index=0;
+let queue=[],balloons=[],particles=[],arrow=null,dragging=false,drag={x:0,y:0},lastTime=0;
+let audioCtx=null;
+
+function resize(){
+ dpr=Math.min(window.devicePixelRatio||1,2);
+ W=window.innerWidth;H=window.innerHeight;
+ canvas.width=W*dpr;canvas.height=H*dpr;canvas.style.width=W+'px';canvas.style.height=H+'px';
+ ctx.setTransform(dpr,0,0,dpr,0,0);
+}
+window.addEventListener('resize',resize);resize();
+
+function initAudio(){
+ try{
+  if(!audioCtx)audioCtx=new(window.AudioContext||window.webkitAudioContext)();
+  if(audioCtx.state==='suspended')audioCtx.resume();
+ }catch(e){}
+}
+function tone(type='shoot'){
+ if(muted)return;
+ try{
+  initAudio();if(!audioCtx)return;
+  const o=audioCtx.createOscillator(),g=audioCtx.createGain(),n=audioCtx.currentTime;
+  if(type==='pop'){
+   o.type='sine';o.frequency.setValueAtTime(360,n);o.frequency.exponentialRampToValueAtTime(70,n+.14);
+   g.gain.setValueAtTime(.42,n);g.gain.exponentialRampToValueAtTime(.001,n+.14);o.connect(g);g.connect(audioCtx.destination);o.start(n);o.stop(n+.14);
+  }else if(type==='cling'){
+   o.type='triangle';o.frequency.setValueAtTime(523,n);o.frequency.setValueAtTime(659,n+.09);o.frequency.setValueAtTime(784,n+.18);o.frequency.setValueAtTime(1047,n+.27);
+   g.gain.setValueAtTime(.28,n);g.gain.exponentialRampToValueAtTime(.001,n+.9);o.connect(g);g.connect(audioCtx.destination);o.start(n);o.stop(n+.9);
+  }else{
+   o.type='triangle';o.frequency.setValueAtTime(240,n);o.frequency.exponentialRampToValueAtTime(480,n+.07);
+   g.gain.setValueAtTime(.14,n);g.gain.exponentialRampToValueAtTime(.001,n+.09);o.connect(g);g.connect(audioCtx.destination);o.start(n);o.stop(n+.09);
+  }
+ }catch(e){}
+}
+
+function shuffle(){
+ queue=[...DATA];
+ for(let i=queue.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[queue[i],queue[j]]=[queue[j],queue[i]]}
+}
+function spawn(){
+ const colors=['#f43f5e','#ec4899','#8b5cf6','#3b82f6','#10b981','#f59e0b','#06b6d4'];
+ while(balloons.length<4 && index+balloons.length<20){
+  const r=30;
+  balloons.push({
+   x:80+Math.random()*Math.max(100,W-160),
+   y=Math.max(130,H-180-Math.random()*Math.max(80,H*.35)),
+   r,color:colors[Math.floor(Math.random()*colors.length)],
+   vy:.35+Math.random()*.45,vx:(Math.random()-.5)*.5,phase:Math.random()*6.28,
+   text:queue[index+balloons.length]
+  });
+ }
+}
+function base(){return{x:W/2,y:H-72}}
+function pointer(e){
+ const p=e.touches&&e.touches.length?e.touches[0]:e;
+ return{x:p.clientX,y:p.clientY}
+}
+function begin(e){
+ if(!started||paused||(arrow&&arrow.active))return;
+ const p=pointer(e),b=base();
+ if(Math.hypot(p.x-b.x,p.y-b.y)<130){dragging=true;drag.x=p.x;drag.y=p.y}
+}
+function move(e){if(!dragging)return;e.preventDefault();drag=pointer(e)}
+function end(){
+ if(!dragging)return;
+ dragging=false;
+ const b=base(),dx=b.x-drag.x,dy=b.y-drag.y,dist=Math.hypot(dx,dy);
+ if(dist<18)return;
+ const power=Math.min(dist*.17,19),a=Math.atan2(dy,dx);
+ arrow={x:b.x,y:b.y,vx:Math.cos(a)*power,vy:Math.sin(a)*power,active:true,angle:a};
+ tone('shoot');
+}
+canvas.addEventListener('mousedown',begin);canvas.addEventListener('mousemove',move);window.addEventListener('mouseup',end);
+canvas.addEventListener('touchstart',e=>{e.preventDefault();begin(e)},{passive:false});
+canvas.addEventListener('touchmove',move,{passive:false});canvas.addEventListener('touchend',e=>{e.preventDefault();end()},{passive:false});
+
+function particlesAt(x,y,c){
+ for(let i=0;i<28;i++){const a=Math.random()*Math.PI*2,s=1+Math.random()*5;particles.push({x,y,vx:Math.cos(a)*s,vy:Math.sin(a)*s,r:2+Math.random()*4,c,a:1,d:.025+Math.random()*.025})}
+}
+function update(dt){
+ if(!started||paused)return;
+ if(arrow?.active){
+  arrow.x+=arrow.vx*dt;arrow.y+=arrow.vy*dt;arrow.vy+=.11*dt;arrow.angle=Math.atan2(arrow.vy,arrow.vx);
+  if(arrow.x<-40||arrow.x>W+40||arrow.y<-40||arrow.y>H+40)arrow.active=false;
+  for(let i=balloons.length-1;i>=0;i--){
+   const b=balloons[i];
+   if(Math.hypot(arrow.x-b.x,arrow.y-b.y)<b.r+22){
+    arrow.active=false;tone('pop');particlesAt(b.x,b.y,b.color);
+    const text=b.text;balloons.splice(i,1);score+=10;
+    document.getElementById('score').textContent='Skor: '+score;
+    showSentence(text);break;
+   }
+  }
+ }
+ for(const b of balloons){
+  b.y-=b.vy*dt;b.phase+=.025*dt;b.x+=Math.sin(b.phase)*.7+b.vx*dt;
+  if(b.x<b.r){b.x=b.r;b.vx=Math.abs(b.vx)}if(b.x>W-b.r){b.x=W-b.r;b.vx=-Math.abs(b.vx)}
+  if(b.y<-80){b.y=H+60;b.x=b.r+Math.random()*(W-2*b.r)}
+ }
+ for(let i=particles.length-1;i>=0;i--){const p=particles[i];p.x+=p.vx*dt;p.y+=p.vy*dt;p.vy+=.05*dt;p.a-=p.d*dt;if(p.a<=0)particles.splice(i,1)}
+ spawn();
+}
+function drawBalloon(b){
+ ctx.save();ctx.translate(b.x,b.y);
+ ctx.beginPath();ctx.moveTo(0,b.r);ctx.quadraticCurveTo(5,b.r+20,0,b.r+38);ctx.strokeStyle='rgba(255,255,255,.65)';ctx.lineWidth=1.5;ctx.stroke();
+ const g=ctx.createRadialGradient(-9,-10,2,0,0,b.r);g.addColorStop(0,'#fff');g.addColorStop(.3,b.color);g.addColorStop(1,shade(b.color,-45));
+ ctx.beginPath();ctx.ellipse(0,0,b.r,b.r*1.15,0,0,Math.PI*2);ctx.fillStyle=g;ctx.shadowColor='rgba(0,0,0,.35)';ctx.shadowBlur=12;ctx.fill();
+ ctx.beginPath();ctx.moveTo(-4,b.r*1.12);ctx.lineTo(4,b.r*1.12);ctx.lineTo(0,b.r*1.2);ctx.closePath();ctx.fillStyle=b.color;ctx.fill();
+ ctx.restore();
+}
+function drawBow(){
+ const b=base();ctx.save();ctx.translate(b.x,b.y);
+ ctx.beginPath();ctx.arc(0,0,38,Math.PI,0);ctx.strokeStyle='#a16207';ctx.lineWidth=7;ctx.lineCap='round';ctx.stroke();
+ if(dragging){
+  ctx.beginPath();ctx.moveTo(-31,0);ctx.lineTo(drag.x-b.x,drag.y-b.y);ctx.lineTo(31,0);ctx.strokeStyle='#f1f5f9';ctx.lineWidth=3;ctx.stroke();
+  const dx=b.x-drag.x,dy=b.y-drag.y,dist=Math.hypot(dx,dy),a=Math.atan2(dy,dx);
+  ctx.beginPath();ctx.moveTo(0,0);ctx.lineTo(Math.cos(a)*Math.min(220,dist*4),Math.sin(a)*Math.min(220,dist*4));ctx.strokeStyle='rgba(255,255,255,.55)';ctx.setLineDash([7,7]);ctx.lineWidth=2;ctx.stroke();ctx.setLineDash([]);
+  ctx.beginPath();ctx.arc(drag.x,drag.y,7,0,Math.PI*2);ctx.fillStyle='#fbbf24';ctx.fill();
+ }else if(!arrow?.active){
+  ctx.beginPath();ctx.moveTo(-30,0);ctx.lineTo(0,0);ctx.lineTo(30,0);ctx.strokeStyle='rgba(255,255,255,.75)';ctx.lineWidth=2;ctx.stroke();
+ }
+ ctx.restore();
+}
+function drawArrow(){
+ if(!arrow?.active)return;ctx.save();ctx.translate(arrow.x,arrow.y);ctx.rotate(arrow.angle);
+ ctx.beginPath();ctx.moveTo(-23,0);ctx.lineTo(17,0);ctx.strokeStyle='#1e293b';ctx.lineWidth=4;ctx.stroke();
+ ctx.beginPath();ctx.moveTo(17,0);ctx.lineTo(9,-7);ctx.lineTo(9,7);ctx.closePath();ctx.fillStyle='#f59e0b';ctx.fill();ctx.restore();
+}
+function render(){
+ ctx.clearRect(0,0,W,H);
+ balloons.forEach(drawBalloon);drawBow();drawArrow();
+ particles.forEach(p=>{ctx.save();ctx.globalAlpha=Math.max(0,p.a);ctx.fillStyle=p.c;ctx.beginPath();ctx.arc(p.x,p.y,p.r,0,Math.PI*2);ctx.fill();ctx.restore()});
+}
+function loop(t){const dt=Math.min(2,(t-lastTime||16.67)/16.67);lastTime=t;update(dt);render();requestAnimationFrame(loop)}
+function shade(hex,p){
+ let n=parseInt(hex.slice(1),16),a=Math.round(2.55*p),r=Math.max(0,Math.min(255,(n>>16)+a)),g=Math.max(0,Math.min(255,((n>>8)&255)+a)),b=Math.max(0,Math.min(255,(n&255)+a));return'#'+(1<<24|r<<16|g<<8|b).toString(16).slice(1)
+}
+function showSentence(text){
+ paused=true;tone('cling');document.getElementById('sentence').textContent='“'+text+'”';document.getElementById('sentenceModal').classList.remove('hidden')
+}
+document.getElementById('nextBtn').onclick=()=>{
+ document.getElementById('sentenceModal').classList.add('hidden');paused=false;index++;
+ document.getElementById('progressText').textContent=`Balon pecah: ${index} / 20`;
+ document.getElementById('progress').style.width=(index/20*100)+'%';
+ if(index>=20)finish();
+};
+function finish(){paused=true;document.getElementById('finalScore').textContent=score;document.getElementById('gameover').classList.remove('hidden');bgm.volume=.08}
+document.getElementById('startBtn').onclick=()=>{
+ initAudio();if(!muted){bgm.volume=.35;bgm.play().catch(()=>{})}
+ started=true;shuffle();spawn();document.getElementById('welcome').style.display='none';lastTime=performance.now();requestAnimationFrame(loop)
+};
+document.getElementById('restartBtn').onclick=()=>{
+ score=0;index=0;paused=false;arrow=null;dragging=false;balloons=[];particles=[];shuffle();spawn();
+ document.getElementById('score').textContent='Skor: 0';document.getElementById('progressText').textContent='Balon pecah: 0 / 20';document.getElementById('progress').style.width='0%';
+ document.getElementById('gameover').classList.add('hidden');bgm.volume=.35;if(!muted)bgm.play().catch(()=>{})
+};
+document.getElementById('soundBtn').onclick=()=>{
+ muted=!muted;bgm.muted=muted;document.getElementById('soundBtn').textContent=muted?'🔇 OFF':'🔊 ON'
+};
+document.getElementById('fsBtn').onclick=()=>{
+ if(!document.fullscreenElement)document.documentElement.requestFullscreen?.().catch(()=>{});else document.exitFullscreen?.()
+};
+</script>
+</body>
+</html>
